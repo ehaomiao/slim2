@@ -205,7 +205,7 @@ class DataObject implements DataObjectInterface
 
             if ($this->has($key)) {
                 $value = $this->get($key);
-            } 
+            }
         }
 
         if (is_array($value)) {

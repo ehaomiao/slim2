@@ -43,25 +43,57 @@ abstract class Application extends \Slim\App
         }
 
         $container->instance(ContainerInterface::class, $container);
+        $container->instance(SettingInterface::class, $this->generateSetting());
 
         parent::__construct($container);
         // 
-        $this->initialize();
+        $this->__init();
 
         $container->singleton('settings', SettingInterface::class);
-
-        $this->registerRoutes();
     }
 
     /**
-     * initialize
+     * __init
      * 
      * 需要额外的初始化，覆盖此方法
      *
      * @return void
      */
-    protected function initialize()
+    protected function __init()
     {
+    }
+
+    /**
+     * 启动
+     *
+     * @return void
+     */
+    final public function bootstrap()
+    {
+        // 生命周期函数__bootstrap
+        $this->__bootstrap();
+    }
+
+    /**
+     * __bootstrap
+     * 
+     * 需要额外的初始化，覆盖此方法
+     *
+     * @return void
+     */
+    protected function __bootstrap()
+    {
+        $this->registerRoutes();
+    }
+
+    /**
+     * create setting
+     */
+    protected function generateSetting(): SettingInterface
+    {
+        $settings = require_once __DIR__  . '/../settings.php';
+
+        return new Setting($settings);
     }
 
     /**
