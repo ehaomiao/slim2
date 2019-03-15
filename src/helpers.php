@@ -63,9 +63,16 @@ if (!function_exists('studly')) {
      * @param  string  $value
      * @return string
      */
-    function studly($value)
+    function studly(string $value, string $delimiter = null)
     {
-        $value = ucwords(str_replace(['-', '_'], ' ', strtolower($value)));
+        if ($delimiter) {
+            $values = explode($delimiter, $value);
+            $values = array_map(function($value){
+                return studly($value);
+            }, $values);
+            return implode($delimiter, $values);
+        }
+        $value = ucwords(str_replace(['-', '_'], ' ', $value));
         return str_replace(' ', '', $value);
     }
 }
