@@ -93,7 +93,7 @@ abstract class Application extends \Slim\App
      */
     protected function generateSetting(): SettingInterface
     {
-        $settings = require_once __DIR__  . '/../settings.php';
+        $settings = require_once __DIR__  . '/../settings_web.php';
 
         return new Setting($settings);
     }
@@ -213,7 +213,7 @@ abstract class Application extends \Slim\App
                 $contentLength = $body->getSize();
             }
 
-            $body = $this->__beforeEcho($body);
+            $body = $this->__echoBefore($body);
 
             $offset = 0;
             $contentRange = $response->getHeaderLine('Content-Range');
@@ -253,7 +253,7 @@ abstract class Application extends \Slim\App
      * @param StreamInterface $body
      * @return StreamInterface
      */
-    protected function __beforeEcho(StreamInterface $body) : StreamInterface
+    protected function __echoBefore(StreamInterface $body) : StreamInterface
     {
         return $body;
     }
