@@ -26,14 +26,14 @@ trait AllTrait
      *
      * @var ServerRequestInterface
      */
-    protected $request;
+    private $request;
 
     /**
      * A response object to send to the HTTP client
      *
      * @var ResponseInterface
      */
-    protected $response;
+    private $response;
 
     /**
      * __construct
@@ -48,14 +48,9 @@ trait AllTrait
         $code=null, 
         $previous=null
     ) {
-        $this->setRequestAndResponse(func_get_args());
-
         if (!is_int($code)) {
-            if (!$code instanceof \Throwable) {
-                $data = $code;
-            } else {
-                $previous = $code;
-            }
+            // [message, previous]
+            $previous = $code;
             $code = $this->getDefaultCode();
         }
 
@@ -63,42 +58,67 @@ trait AllTrait
     }
 
     /**
-     * Set request and response
+     * Set request
      *
-     * @param [type] $args
-     * @return void
+     * @param ServerRequestInterface $request
+     * @return $this
      */
-    protected function setRequestAndResponse($args)
+    public function setRequest(ServerRequestInterface $request)
     {
-        $r = array_pop($args);
-
-        if ($r instanceof ResponseInterface) {
-            $this->response = $r;
-        } elseif ($r instanceof ServerRequestInterface) {
-            $this->request = $r;
-        }
-
-        $r = array_pop($args);
-
-        if ($r instanceof ServerRequestInterface) {
-            $this->request = $r;
-        } elseif ($r instanceof ResponseInterface) {
-            $this->response = $r;
-        }
+        $this->request = $request;
+        return $this;
     }
 
     /**
-     * __get
+     * Set response
      *
-     * @return mixed
+     * @param ResponseInterface $response
+     * @return $this
      */
-    public function __get($name)
+    public function setResponse(ResponseInterface $response)
     {
-        if (in_array($name, ['request', 'response'])) {
-            return $this->{$name};
-        }
+        $this->response = $response;
+        return $this;
+    }
 
-        throw new \RuntimeException(i18n('Property %s::%s not exist.', get_class($this), $name));
+    /**
+     * Set request
+     *
+     * @return ServerRequestInterface
+     */
+    public function getRequest() : ServerRequestInterface
+    {
+        return $this->request;
+    }
+
+    /**
+     * Set response
+     * 
+     * @return ResponseInterface
+     */
+    public function getResponse() : ResponseInterface
+    {
+        return $this->response;
+    }
+
+    /**
+     * Has request
+     *
+     * @return bool
+     */
+    public function hasRequest() : bool
+    {
+        return isset($this->request);
+    }
+
+    /**
+     * Has response
+     * 
+     * @return bool
+     */
+    public function hasResponse() : bool
+    {
+        return isset($this->response);
     }
 
 }

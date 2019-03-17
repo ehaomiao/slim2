@@ -21,13 +21,8 @@ class Unauthorized extends BadRequest
     /**
      * __construct
      */
-    public function __construct()
+    public function __construct() 
     {
-        $args = func_get_args();
-
-        array_unshift($args, -401);
-        array_unshift($args, 'Unauthorized');
-
-        call_user_func_array('parent::__construct', $args);
+        parent::__construct('Unauthorized', -401);
     }
 }

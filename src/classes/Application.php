@@ -15,6 +15,7 @@ use Haomiao\Lib\Middleware\Cors;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 use Slim\Exception\SlimException;
 use Slim\Exception\MethodNotAllowedException;
@@ -123,11 +124,17 @@ abstract class Application extends \Slim\App
     ) {
         // 转换slim抛出的异常
         if ($e instanceof MethodNotAllowedException) {
-            $e = new MethodNotAllowed($e->getAllowedMethods(), $e->getRequest(), $e->getResponse());
+            $e = (new MethodNotAllowed($e->getAllowedMethods()))
+                ->setRequest($e->getRequest())
+                ->setResponse($e->getResponse());
         } elseif ($e instanceof NotFoundException) {
-            $e = new NotFound($e->getRequest(), $e->getResponse());
+            $e = (new NotFound())
+                ->setRequest($e->getRequest())
+                ->setResponse($e->getResponse());
         } elseif ($e instanceof SlimException) {
-            $e = new HaomiaoException($e->getMessage(), $e->getRequest(), $e->getResponse());
+            $e = (new HaomiaoException($e->getMessage()))
+                ->setRequest($e->getRequest())
+                ->setResponse($e->getResponse());
         }
 
         $setting = $this->getContainer()->get('settings');
@@ -143,18 +150,13 @@ abstract class Application extends \Slim\App
                 $handler->setThrowable($e);
 
                 if ($e instanceof HaomiaoException || $e instanceof HaomiaoMessage) {
-                    if ($e->request) {
-                        $request = $e->request;
+                    if ($e->hasRequest()) {
+                        $request = $e->getRequest();
                     }
-                    if ($e->response) {
-                        $response = $e->response;
+                    if ($e->hasResponse()) {
+                        $response = $e->getResponse();
                     }
                 }
-
-                // TODO 临时
-                $response = (new Cors(config('app_cors')))($request, $response, function ($request, $response) {
-                    return $response;
-                });
 
                 try {
                     return $handler->handle($request, $response);
@@ -163,11 +165,6 @@ abstract class Application extends \Slim\App
                 }
             }
         }
-
-        // TODO 临时
-        $response = (new Cors(config('app_cors')))($request, $response, function ($request, $response) {
-            return $response;
-        });
 
         return parent::handleException($e, $request, $response);
     }
@@ -216,6 +213,8 @@ abstract class Application extends \Slim\App
                 $contentLength = $body->getSize();
             }
 
+            $body = $this->__beforeEcho($body);
+
             $offset = 0;
             $contentRange = $response->getHeaderLine('Content-Range');
             if ($contentRange) {
@@ -248,4 +247,14 @@ abstract class Application extends \Slim\App
         }
     }
 
+    /**
+     * 输出之前
+     *
+     * @param StreamInterface $body
+     * @return StreamInterface
+     */
+    protected function __beforeEcho(StreamInterface $body) : StreamInterface
+    {
+        return $body;
+    }
 }
