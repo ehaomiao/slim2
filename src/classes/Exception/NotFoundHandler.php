@@ -70,9 +70,8 @@ class NotFoundHandler extends BadRequestHandler
         } else {
             $contentType = $this->determineContentType();
             $output = $this->rendererProcess($response);
+            $response = $response->withStatus(404);
         }
-
-        $response = $response->withStatus(404);
 
         return $output;
     }

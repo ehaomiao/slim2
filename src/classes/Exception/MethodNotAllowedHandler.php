@@ -45,10 +45,10 @@ class MethodNotAllowedHandler extends BadRequestHandler
         } else {
             $contentType = $this->determineContentType();
             $output = $this->rendererProcess($response);
+            $response = $response->withStatus(405);
         }
 
-        $response = $response->withStatus(405)
-            ->withHeader('Allow', implode(', ', $this->thrown->getAllowedMethods()));
+        $response->withHeader('Allow', implode(', ', $this->thrown->getAllowedMethods()));
 
         return $output;
     }
