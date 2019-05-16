@@ -28,7 +28,7 @@ class Json extends Renderer
      * @var array
      */
     private static $convertors = [
-        [self::class, 'gb2312']
+        // [self::class, 'gb2312']
     ];
 
     /**
